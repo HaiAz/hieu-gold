@@ -23,6 +23,16 @@
 # misc
 .DS_Store
 *.pem
+Thumbs.db
+
+# logs & temp (dev server, screenshots, scratch)
+*.log
+.tmp-shots/
+*.pid
+
+# Claude Code (local/personal settings & caches — không commit)
+.claude/settings.local.json
+.claude/.cache/
 
 # debug
 npm-debug.log*
@@ -31,7 +41,8 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
-.env*
+.env
+.env*.local
 
 # vercel
 .vercel
