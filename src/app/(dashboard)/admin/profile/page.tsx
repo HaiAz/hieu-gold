@@ -16,8 +16,13 @@ const EMPTY: Profile = {
   heroImageMobileUrl: "",
   heroFocusY: 50,
   heroFocusYMobile: 50,
+  aboutStatement: "",
+  aboutParagraphs: [],
+  aboutStats: [],
   social: { facebook: "", youtube: "", tiktok: "", zalo: "", instagram: "" },
 };
+
+const MAX_STATS = 5;
 
 export default function ProfileEditor() {
   const [profile, setProfile] = useState<Profile>(EMPTY);
@@ -41,6 +46,49 @@ export default function ProfileEditor() {
   }
   function updateSocial(key: keyof Profile["social"], value: string) {
     setProfile((p) => ({ ...p, social: { ...p.social, [key]: value } }));
+  }
+
+  // ---- About: đoạn mô tả ----
+  function updateParagraph(i: number, value: string) {
+    setProfile((p) => {
+      const arr = [...(p.aboutParagraphs ?? [])];
+      arr[i] = value;
+      return { ...p, aboutParagraphs: arr };
+    });
+  }
+  function addParagraph() {
+    setProfile((p) => ({
+      ...p,
+      aboutParagraphs: [...(p.aboutParagraphs ?? []), ""],
+    }));
+  }
+  function removeParagraph(i: number) {
+    setProfile((p) => ({
+      ...p,
+      aboutParagraphs: (p.aboutParagraphs ?? []).filter((_, j) => j !== i),
+    }));
+  }
+
+  // ---- About: stats ----
+  function updateStat(i: number, key: "n" | "l", value: string) {
+    setProfile((p) => {
+      const arr = [...(p.aboutStats ?? [])];
+      arr[i] = { ...arr[i], [key]: value };
+      return { ...p, aboutStats: arr };
+    });
+  }
+  function addStat() {
+    setProfile((p) => {
+      const cur = p.aboutStats ?? [];
+      if (cur.length >= MAX_STATS) return p;
+      return { ...p, aboutStats: [...cur, { n: "", l: "" }] };
+    });
+  }
+  function removeStat(i: number) {
+    setProfile((p) => ({
+      ...p,
+      aboutStats: (p.aboutStats ?? []).filter((_, j) => j !== i),
+    }));
   }
 
   async function onSave(e: React.FormEvent) {
@@ -187,6 +235,114 @@ export default function ProfileEditor() {
                 onChange={(e) => updateSocial("instagram", e.target.value)}
               />
             </Field>
+          </div>
+        </div>
+
+        <div className="adm-card space-y-5">
+          <h2 className="adm-h2">Phần “Giới thiệu” (trang chủ)</h2>
+
+          <Field label="Câu giới thiệu lớn" id="aboutStatement">
+            <textarea
+              id="aboutStatement"
+              className="adm-input h-24"
+              placeholder="Tôi tìm những khoảnh khắc *thật* — ..."
+              value={profile.aboutStatement ?? ""}
+              onChange={(e) => update("aboutStatement", e.target.value)}
+            />
+            <p className="adm-muted text-[11px]">
+              Đặt từ/cụm trong dấu sao <code>*như này*</code> để in nghiêng màu
+              vàng (gold). Bỏ trống sẽ dùng câu mặc định.
+            </p>
+          </Field>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="adm-label">Đoạn mô tả</span>
+              <button
+                type="button"
+                className="adm-link text-xs"
+                onClick={addParagraph}
+              >
+                + Thêm đoạn
+              </button>
+            </div>
+            {(profile.aboutParagraphs ?? []).length === 0 ? (
+              <p className="adm-muted text-xs">
+                Chưa có đoạn nào — sẽ dùng 2 đoạn mặc định. Thêm đoạn để tự viết.
+              </p>
+            ) : (
+              (profile.aboutParagraphs ?? []).map((para, i) => (
+                <div key={i} className="flex gap-2">
+                  <textarea
+                    className="adm-input h-20"
+                    placeholder={`Đoạn ${i + 1}...`}
+                    value={para}
+                    onChange={(e) => updateParagraph(i, e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeParagraph(i)}
+                    className="adm-btn-danger shrink-0 text-xs"
+                    title="Xoá đoạn"
+                  >
+                    Xoá
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="adm-label">
+                Số liệu thống kê ({(profile.aboutStats ?? []).length}/{MAX_STATS})
+              </span>
+              <button
+                type="button"
+                className="adm-link text-xs"
+                onClick={addStat}
+                disabled={(profile.aboutStats ?? []).length >= MAX_STATS}
+                style={
+                  (profile.aboutStats ?? []).length >= MAX_STATS
+                    ? { opacity: 0.4, cursor: "not-allowed" }
+                    : undefined
+                }
+              >
+                + Thêm số liệu
+              </button>
+            </div>
+            {(profile.aboutStats ?? []).length === 0 ? (
+              <p className="adm-muted text-xs">
+                Chưa có số liệu — sẽ dùng bộ mặc định (Dự án / Khách hàng / Năm KN
+                / Giải thưởng).
+              </p>
+            ) : (
+              (profile.aboutStats ?? []).map((s, i) => (
+                <div key={i} className="flex gap-2">
+                  <input
+                    className="adm-input"
+                    style={{ maxWidth: 110 }}
+                    placeholder="240"
+                    value={s.n}
+                    onChange={(e) => updateStat(i, "n", e.target.value)}
+                  />
+                  <input
+                    className="adm-input"
+                    placeholder="Dự án hoàn thành"
+                    value={s.l}
+                    onChange={(e) => updateStat(i, "l", e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeStat(i)}
+                    className="adm-btn-danger shrink-0 text-xs"
+                    title="Xoá"
+                  >
+                    Xoá
+                  </button>
+                </div>
+              ))
+            )}
           </div>
         </div>
 

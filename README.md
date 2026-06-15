@@ -155,16 +155,6 @@ Mở http://localhost:3000.
 
 `.env` đã được tạo sẵn với config Firebase của project `hieu-gold`. Nếu deploy nơi khác, copy `.env.example` → `.env` và điền.
 
-## Tạo super admin (lần đầu)
-
-1. Truy cập http://localhost:3000/setup
-2. Form đã prefill:
-   - Email: `hieugold@hieu-gold.com` (Firebase Auth bắt buộc email; đây là dạng email của username `hieugold`)
-   - Mật khẩu: `123456789aA@`
-3. Bấm **Tạo super admin** → tự động đăng nhập và chuyển vào `/admin`.
-
-> Trang `/setup` sẽ khoá sau khi đã có admin. Để đổi mật khẩu, dùng Firebase Console → Authentication → Users.
-
 ## Sau khi setup
 
 - `/admin/profile` — nhập họ tên, bio, email, SĐT, link social, ảnh đại diện.

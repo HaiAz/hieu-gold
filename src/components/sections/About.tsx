@@ -1,7 +1,25 @@
 import AppImage from "@/components/ui/AppImage";
-import type { Profile, Project } from "@/lib/types";
+import type { AboutStat, Profile, Project } from "@/lib/types";
+import { Fragment } from "react";
 
-type Stat = { n: string; l: string };
+// Mặc định khi admin chưa nhập (giữ nội dung gốc).
+const DEFAULT_STATEMENT =
+  "Tôi tìm những khoảnh khắc *thật* — ánh sáng cuối ngày, một ánh nhìn không dàn dựng, hơi ấm của màu film — và giữ chúng lại mãi mãi.";
+const DEFAULT_PARAGRAPHS = [
+  "Hơn một thập kỷ đứng sau ống kính, tôi theo đuổi một thẩm mỹ giản dị: tự nhiên, ấm áp, và giàu cảm xúc. Mỗi khung hình là một câu chuyện được kể chậm rãi.",
+  "Từ chân dung studio đến phóng sự cưới và những chuyến đi xa, tôi tin rằng bức ảnh đẹp nhất là bức khiến bạn nhớ lại cảm giác của chính khoảnh khắc đó.",
+];
+
+// Render statement: phần trong *...* thành <em> (in nghiêng màu gold).
+function renderStatement(text: string) {
+  return text.split(/(\*[^*]+\*)/g).map((part, i) =>
+    part.startsWith("*") && part.endsWith("*") && part.length > 1 ? (
+      <em key={i}>{part.slice(1, -1)}</em>
+    ) : (
+      <Fragment key={i}>{part}</Fragment>
+    )
+  );
+}
 
 export default function About({
   profile,
@@ -10,31 +28,33 @@ export default function About({
   profile: Profile | null;
   projects: Project[];
 }) {
-  const stats: Stat[] = [
-    { n: String(projects.length || 240), l: "Dự án hoàn thành" },
-    { n: "58", l: "Khách hàng thương hiệu" },
-    { n: "10", l: "Năm kinh nghiệm" },
-    { n: "14", l: "Giải thưởng & vinh danh" },
-  ];
+  const statement = profile?.aboutStatement?.trim() || DEFAULT_STATEMENT;
+  const paragraphs =
+    profile?.aboutParagraphs?.filter((p) => p.trim()) ?? [];
+  const finalParagraphs = paragraphs.length ? paragraphs : DEFAULT_PARAGRAPHS;
+
+  const customStats = profile?.aboutStats?.filter((s) => s.n.trim()) ?? [];
+  const stats: AboutStat[] = customStats.length
+    ? customStats
+    : [
+        { n: String(projects.length || 240), l: "Dự án hoàn thành" },
+        { n: "58", l: "Khách hàng thương hiệu" },
+        { n: "10", l: "Năm kinh nghiệm" },
+        { n: "14", l: "Giải thưởng & vinh danh" },
+      ];
 
   return (
     <section className="about pad" id="about" data-screen-label="Giới thiệu">
       <div className="about-grid">
         <p className="about-statement reveal-lines">
-          Tôi tìm những khoảnh khắc <em>thật</em> — ánh sáng cuối ngày, một ánh
-          nhìn không dàn dựng, hơi ấm của màu film — và giữ chúng lại mãi mãi.
+          {renderStatement(statement)}
         </p>
         <div className="about-side">
-          <p className="reveal">
-            Hơn một thập kỷ đứng sau ống kính, tôi theo đuổi một thẩm mỹ giản dị:
-            tự nhiên, ấm áp, và giàu cảm xúc. Mỗi khung hình là một câu chuyện
-            được kể chậm rãi.
-          </p>
-          <p className="reveal">
-            Từ chân dung studio đến phóng sự cưới và những chuyến đi xa, tôi tin
-            rằng bức ảnh đẹp nhất là bức khiến bạn nhớ lại cảm giác của chính
-            khoảnh khắc đó.
-          </p>
+          {finalParagraphs.map((p, i) => (
+            <p className="reveal" key={i}>
+              {p}
+            </p>
+          ))}
           {profile?.avatarUrl ? (
             <AppImage
               className="portrait film-img reveal"
@@ -47,8 +67,8 @@ export default function About({
         </div>
       </div>
       <div className="stats">
-        {stats.map((s) => (
-          <div className="stat reveal" key={s.l}>
+        {stats.map((s, i) => (
+          <div className="stat reveal" key={`${s.l}-${i}`}>
             <div className="n" data-count={s.n}>
               {s.n}
             </div>

@@ -17,8 +17,17 @@ export type Profile = {
   heroFocusY?: number; // vị trí cắt dọc desktop, 0=trên 50=giữa 100=dưới
   heroFocusYMobile?: number; // vị trí cắt dọc mobile
   galleryImages?: ProjectImage[]; // ảnh Gallery riêng, giữ đúng thứ tự đã chọn
+  // Phần "Giới thiệu" (About) trên trang chủ:
+  aboutStatement?: string; // câu lớn; dùng *từ* để in nghiêng màu gold
+  aboutParagraphs?: string[]; // các đoạn mô tả bên phải
+  aboutStats?: AboutStat[]; // số liệu thống kê (tối đa 5)
   social: SocialLinks;
   updatedAt?: number;
+};
+
+export type AboutStat = {
+  n: string; // số (vd "240", "10")
+  l: string; // nhãn (vd "Dự án hoàn thành")
 };
 
 export type ProjectImage = {

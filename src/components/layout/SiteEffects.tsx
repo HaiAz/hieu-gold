@@ -53,9 +53,18 @@ export default function SiteEffects() {
           if (!e.isIntersecting) return;
           const el = e.target as HTMLElement;
           countIO.unobserve(el);
-          const target = parseInt(el.dataset.count || "0", 10);
+          const raw = el.dataset.count || "";
+          // Tách phần số ở giữa + tiền tố/hậu tố (vd "99+" → 99 và "+", "~10" → 10 và "~").
+          const match = raw.match(/^(\D*)(\d+)(\D*)$/);
+          if (!match) {
+            // Không có số (vd nhãn chữ) → giữ nguyên, không đếm.
+            el.textContent = raw;
+            return;
+          }
+          const [, prefix, digits, suffix] = match;
+          const target = parseInt(digits, 10);
           if (reduce || !target) {
-            el.textContent = String(target);
+            el.textContent = prefix + target + suffix;
             return;
           }
           const dur = 1400;
@@ -64,7 +73,7 @@ export default function SiteEffects() {
             if (!start) start = ts;
             const p = Math.min((ts - start) / dur, 1);
             const eased = 1 - Math.pow(1 - p, 3);
-            el.textContent = String(Math.round(eased * target));
+            el.textContent = prefix + Math.round(eased * target) + suffix;
             if (p < 1) requestAnimationFrame(step);
           };
           requestAnimationFrame(step);

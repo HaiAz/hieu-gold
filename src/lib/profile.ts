@@ -13,6 +13,9 @@ const EMPTY_PROFILE: Profile = {
   heroImageUrl: "",
   heroImageMobileUrl: "",
   galleryImages: [],
+  aboutStatement: "",
+  aboutParagraphs: [],
+  aboutStats: [],
   social: {},
 };
 
